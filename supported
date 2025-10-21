@@ -3,3 +3,4 @@ lshr
 shl
 ror
 rol
+orcb

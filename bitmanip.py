@@ -1,6 +1,7 @@
 from z3 import *
-import itertools
-N = 8
+from fns import *
+
+N = 32
 
 def bitmanip(x, M, mask, exclusive):
     bits = []
@@ -19,16 +20,17 @@ def bitmanip(x, M, mask, exclusive):
 if __name__ == "__main__":
     x = BitVec('x', N)
     M = BitVec('M', N*N)
-    mask = BitVec('mask', N)
+    mask = BitVec('b', N)
     exclusive = Bool('exclusive')
 
-    constr = (x + BitVec(1, N)) == bitmanip(x, M, mask, exclusive)
+    constr = orcb_32(x) == bitmanip(x, M, mask, exclusive)
 
     s = Solver()
 
+    s.add(exclusive == False)
     s.add(ForAll(x, constr))
 
-    print(s.to_smt2())
+    # print(s.to_smt2())
 
     if s.check() == sat:
         m = s.model()
