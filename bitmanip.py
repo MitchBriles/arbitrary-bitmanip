@@ -1,7 +1,9 @@
+#!/usr/bin/python3
 from z3 import *
 from fns import *
+from sys import argv
 
-N = 32
+N = 16
 
 def bitmanip(x, M, mask, exclusive):
     bits = []
@@ -23,11 +25,11 @@ if __name__ == "__main__":
     mask = BitVec('b', N)
     exclusive = Bool('exclusive')
 
-    constr = orcb_32(x) == bitmanip(x, M, mask, exclusive)
+    constr = fill_with_edge_xor(x) == bitmanip(x, M, mask, exclusive)
 
     s = Solver()
 
-    s.add(exclusive == False)
+    # s.add(exclusive == False)
     s.add(ForAll(x, constr))
 
     # print(s.to_smt2())
@@ -40,5 +42,10 @@ if __name__ == "__main__":
         [print(*f"{resM:0{N*N}b}"[i:i+N]) for i in range(0, N*N, N)]
         print("mask = " + str(m.eval(mask, model_completion=True)))
         print("exclusive = " + str(m.eval(exclusive, model_completion=True)))
+        if "--llvm" in argv:
+            print("\nM (LLVM) =")
+            print(f"@BIG_vec = constant <{N} x i{N}> <")
+            [print(f"  i{N} {int(f'{resM:0{N*N}b}'[i:i+N], 2)}{',' if i < N*N-N else ''}") for i in range(0, N*N, N)]
+            print(">")
     else:
         print("unsound optimization")
