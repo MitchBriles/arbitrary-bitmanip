@@ -3,4 +3,5 @@ lshr
 shl
 ror
 rol
+rev
 orcb
