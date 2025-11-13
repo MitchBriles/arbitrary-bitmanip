@@ -3,7 +3,7 @@ from z3 import *
 from fns import *
 from sys import argv
 
-N = 16
+N = 26
 
 def bitmanip(x, M, mask, exclusive):
     bits = []
@@ -25,11 +25,11 @@ if __name__ == "__main__":
     mask = BitVec('b', N)
     exclusive = Bool('exclusive')
 
-    constr = fill_with_edge_xor(x) == bitmanip(x, M, mask, exclusive)
+    constr = (x << 3) + 6 == bitmanip(x, M, mask, exclusive)
 
     s = Solver()
 
-    # s.add(exclusive == False)
+    s.add(exclusive == False)
     s.add(ForAll(x, constr))
 
     # print(s.to_smt2())
@@ -39,7 +39,7 @@ if __name__ == "__main__":
         print("sound optimization for:")
         resM = int(str(m.eval(M, model_completion=True)))
         print("M =")
-        [print(*f"{resM:0{N*N}b}"[i:i+N]) for i in range(0, N*N, N)]
+        [print(' '.join(f"{resM:0{N*N}b}"[i:i+N]).replace("1", f"\033[0;30;47m1\033[0m")) for i in range(0, N*N, N)]
         print("mask = " + str(m.eval(mask, model_completion=True)))
         print("exclusive = " + str(m.eval(exclusive, model_completion=True)))
         if "--llvm" in argv:

@@ -64,6 +64,20 @@ def bit_reverse(x):
     n = x.size()
     return Concat(*[Extract(i, i, x) for i in range(n)])
 
+def bswap(x):
+    """
+    Byte-swap a Z3 BitVec (reverse byte order).
+    Raises ValueError if the BitVec size is not a multiple of 8.
+    """
+    nbits = x.size()
+    if nbits % 8 != 0:
+        raise ValueError("bswap: input must have a whole number of bytes (size % 8 == 0)")
+
+    nbytes = nbits // 8
+
+    bytes_parts = [Extract((i + 1) * 8 - 1, i * 8, x) for i in range(nbytes)]
+    return Concat(*bytes_parts)
+
 def fill_with_edge_xor(x):
     """
     Returns a bit vector with all bits set to (msb ^ lsb)
